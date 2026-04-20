@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/fatiza/Documents/DATA%20SCIENTIST/CreditScoring/creditscoring/notebooks/mlruns/109768388772094602/11978504bbbf4c8ea51b3b918554ea27/artifacts
+end_time: 1776556288770
+entry_point_name: ''
+experiment_id: '109768388772094602'
+lifecycle_stage: active
+run_id: 11978504bbbf4c8ea51b3b918554ea27
+run_name: lgbm_optuna_tuned
+run_uuid: 11978504bbbf4c8ea51b3b918554ea27
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1776556286605
+status: 3
+tags: []
+user_id: fatiza
