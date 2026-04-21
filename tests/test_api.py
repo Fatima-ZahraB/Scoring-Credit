@@ -1,25 +1,31 @@
 import pytest
 import pandas as pd
 import numpy as np
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 from fastapi.testclient import TestClient
+
+
+# ── Dummy model (GLOBAL) ──────────────────────────────────────────
+
+class DummyModel:
+    def __init__(self, proba=0.3):
+        self.proba = proba
+
+    def predict_proba(self, X):
+        return np.array([[1 - self.proba, self.proba]])
 
 
 # ── Fixtures ──────────────────────────────────────────────────────────────────
 
 @pytest.fixture
-def mock_predictor_loaded(tmp_path):
-    """Patch predictor with a mock that returns controlled predictions."""
-    import app.predictor as pred_module
-
+def mock_predictor_loaded():
     mock_pred = MagicMock()
     mock_pred.model_loaded = True
-    mock_pred.data_loaded  = True
+    mock_pred.data_loaded = True
     mock_pred.total_clients = 100
-    mock_pred.predict.return_value = (0.15, 3.2)   # (proba, ms)
+    mock_pred.predict.return_value = (0.15, 3.2)
 
-    with patch.object(pred_module, "predictor", mock_pred):
+    with patch("app.main.predictor", mock_pred):
         yield mock_pred
 
 
@@ -92,7 +98,7 @@ class TestPredict:
 
     def test_predict_invalid_id_zero(self, client):
         resp = client.post("/predict", json={"SK_ID_CURR": 0})
-        assert resp.status_code == 422  # Pydantic validation error
+        assert resp.status_code == 422
 
     def test_predict_invalid_id_negative(self, client):
         resp = client.post("/predict", json={"SK_ID_CURR": -1})
@@ -125,17 +131,14 @@ class TestPredictor:
         from app.predictor import Predictor
         import joblib
 
-        # Build a minimal mock model
-        mock_model = MagicMock()
-        mock_model.predict_proba.return_value = np.array([[0.85, 0.15]])
-
         model_path = tmp_path / "model.pkl"
-        joblib.dump(mock_model, model_path)
+        joblib.dump(DummyModel(0.15), model_path)
 
         data = pd.DataFrame({
             "SK_ID_CURR": [100001, 100002],
-            "feature_a":  [1.0, 2.0],
+            "feature_a": [1.0, 2.0],
         })
+
         data_path = tmp_path / "clients.csv"
         data.to_csv(data_path, index=False)
 
@@ -150,16 +153,14 @@ class TestPredictor:
         from app.predictor import Predictor
         import joblib
 
-        mock_model = MagicMock()
-        mock_model.predict_proba.return_value = np.array([[0.70, 0.30]])
-
         model_path = tmp_path / "model.pkl"
-        joblib.dump(mock_model, model_path)
+        joblib.dump(DummyModel(0.30), model_path)
 
         data = pd.DataFrame({
             "SK_ID_CURR": [100001],
-            "feature_a":  [1.0],
+            "feature_a": [1.0],
         })
+
         data_path = tmp_path / "clients.csv"
         data.to_csv(data_path, index=False)
 
