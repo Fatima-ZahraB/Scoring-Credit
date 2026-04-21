@@ -1,8 +1,13 @@
 # 🏦 Home Credit Default Risk — Scoring API
 
 Prédiction de probabilité de défaut de remboursement d'un crédit bancaire.
+Cette API permet d’évaluer la **solvabilité d’un client** pour statuer sur une demande de prêt bancaire.  
+Elle s’appuie sur un modèle de **Machine Learning** pour prédire si un client est **solvable** ou **défaillant**, à partir de ses données personnelles,  socio-économiques et de son profil.
 
-[![CI/CD](https://github.com/YOUR_USERNAME/creditscoring/actions/workflows/ci_cd.yml/badge.svg)](https://github.com/YOUR_USERNAME/creditscoring/actions)
+
+[![CI/CD](https://github.com/Fatima-ZahraB/Scoring-Credit/actions/workflows/ci_cd.yml/badge.svg)](https://github.com/Fatima-ZahraB/Scoring-Credit/actions)
+![Python](https://img.shields.io/badge/python-3.12%20|%20CPython-blue?logo=python&logoColor=white)
+![Docker](https://img.shields.io/badge/docker-ready-blue?logo=docker&logoColor=white)
 
 ---
 
@@ -20,11 +25,11 @@ creditscoring/
 │   └── drift_report.py  # Rapport Evidently (data drift)
 ├── tests/
 │   └── test_api.py      # Tests automatisés (pytest)
-├── data/
-│   └── clients_deploy.csv  # Dataset de déploiement
+├── logs/
+│   └── log_predictions.csv  # logs
 ├── models/
 │   └── best_pipe_lgbm.pkl  # Modèle LightGBM entraîné
-├── logs/
+├── data/
 │   └── predictions       # Historique des inputs et outputs de prédictions
 │   └── processed_data    # Dataset de train et test prêt pour la modélisation
 │   └── raw_data          # Ensemble des datasets du projet ( 8 fichiers csv )
@@ -36,23 +41,56 @@ creditscoring/
 
 ---
 
+## 🚀 Fonctionnalités
+
+- ✅ **Endpoint principal `/predict`** pour obtenir une prédiction de solvabilité.  
+- 🧩 **Validation stricte des données** via des modèles `Pydantic`.  
+- 🧾 **Logs structurés** dans `logs/`.  
+- 🧪 **Tests unitaires et d’intégration** (via `pytest`).  
+- 🐳 **Image Docker** prête à être déployée.
+
+---
+
 ## Démarrage rapide
 
 ### 1. Installation
 
 ```bash
-git clone https://github.com/Fatima-ZahraB/creditscoring.git
+git clone https://github.com/Fatima-ZahraB/Scoring-Credit.git
 cd creditscoring
 pip install -r requirements.txt
 ```
+ou 
 
+### 2. Étapes d'installation avec POETRY
+
+1. **Cloner le repository**
+```bash
+git clone https://github.com/Fatima-ZahraB/Scoring-Credit.git
+cd creditscoring
+```
+
+2. **Installer les dépendances**
+```bash
+poetry install
+```
+
+3. **Activer l'environnement virtuel**
+```bash
+poetry shell
+```
+
+4. **Vérifier l'installation**
+```bash
+python --version  # Devrait afficher Python 3.12.x
+```
 ### 2. Prérequis
 
 Placer les fichiers suivants avant de démarrer :
 
 ```
-models/best_pipe_lgbm.pkl   ← modèle entraîné (joblib)
-data/clients_deploy.csv     ← CSV des clients (avec SK_ID_CURR)
+models/best_pipe_lgbm.pkl               modèle entraîné (joblib)
+data/predictions/sample_deploy.csv      CSV des clients (avec SK_ID_CURR)
 ```
 
 ### 3. Lancer l'API FastAPI
@@ -126,9 +164,23 @@ Vérification de l'état de l'API.
 
 Retourne l'historique de toutes les prédictions.
 
+
+### 🧩 Endpoints disponibles
+
+| Méthode | Route        | Description |
+|----------|--------------|-------------|
+| `GET`    | `/`          | Page d’accueil |
+| `POST`   | `/predict`   | Prédiction de défaut |
+| `GET`    | `/logs`      | Lecture des logs |
+
+
 ---
 
 ## Tests
+
+Les tests unitaires et d’intégration sont gérés avec **pytest** et **pytest-cov** afin de garantir la fiabilité du modèle et de mesurer la couverture du code.  
+
+### ▶️ Lancer la suite de tests (depuis la racine du projet)  
 
 ```bash
 # Lancer tous les tests
@@ -137,6 +189,21 @@ pytest tests/ -v
 # Avec rapport de couverture
 pytest tests/ --cov=app --cov-report=term-missing
 ```
+
+---
+
+## 🧰 Dockerisation
+
+La dockerisation permet d’encapsuler l’API FastAPI et son modèle de Machine Learning dans un conteneur léger et portable.
+Cela garantit une exécution identique sur tous les environnements (local, cloud, CI/CD) et simplifie le déploiement.
+
+### 🎯 Objectif
+
+Faciliter le déploiement de l’API sans dépendances locales.
+
+Garantir un environnement reproductible entre les machines de développement, test et production.
+
+Simplifier le scaling horizontal (plusieurs instances conteneurisées derrière un load balancer).
 
 ---
 
